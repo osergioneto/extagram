@@ -29,16 +29,27 @@ defmodule ExtagramWeb do
 
   def view do
     quote do
-      use Phoenix.View,
-        root: "lib/extagram_web/templates",
-        namespace: ExtagramWeb
+      use Phoenix.LiveView,
+        layout: {ExtagramWeb.LayoutView, "live.html"}
 
-      # Import convenience functions from controllers
-      import Phoenix.Controller,
-        only: [get_flash: 1, get_flash: 2, view_module: 1, view_template: 1]
-
-      # Include shared imports and aliases for views
       unquote(view_helpers())
+      # Added Start
+      import ExtagramWeb.LiveHelpers
+
+      alias Extagram.Accounts.User
+      @impl true
+      def handle_info(%{event: "logout_user", payload: %{user: %User{id: id}}}, socket) do
+        with %User{id: ^id} <- socket.assigns.current_user do
+          {:noreply,
+           socket
+           |> redirect(to: "/")
+           |> put_flash(:info, "Logged out successfully.")}
+        else
+          _any -> {:noreply, socket}
+        end
+      end
+
+      # Added END
     end
   end
 
@@ -48,6 +59,28 @@ defmodule ExtagramWeb do
         layout: {ExtagramWeb.LayoutView, "live.html"}
 
       unquote(view_helpers())
+      # Added Start
+      import ExtagramWeb.LiveHelpers
+
+      alias Extagram.Accounts.User
+      @impl true
+      def handle_info(%{event: "logout_user", payload: %{user: %User{id: id}}}, socket) do
+        with %User{id: ^id} <- socket.assigns.current_user do
+          {:noreply,
+           socket
+           |> redirect(to: "/")
+           |> put_flash(:info, "Logged out successfully.")}
+        else
+          _any -> {:noreply, socket}
+        end
+      end
+
+      @impl true
+      def handle_params(_unsigned_params, uri, socket) do
+        {:noreply,
+         socket
+         |> assign(current_uri_path: URI.parse(uri).path)}
+      end
     end
   end
 

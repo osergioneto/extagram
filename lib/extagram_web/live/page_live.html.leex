@@ -1,6 +1,5 @@
-<div x-data="{ open: false }">
-  <button @click="open = true">Open Dropdown</button>
-  <ul x-show="open" @click.away="open = false">Dropdown Body </ul>
-</div>
-
-<h1 class="text-red-500 text-5xl font-bold text-center">Instagram Clone</h1>
+<%= if @current_user do %>
+  <h1>User Logged In Homepage</h1>
+<% else %>
+  <%= live_component @socket, InstagramCloneWeb.PageLiveComponent, changeset: @changeset, trigger_submit: @trigger_submit %>
+<% end %>
